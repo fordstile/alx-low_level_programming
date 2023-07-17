@@ -64,4 +64,5 @@ Note that we will compile with your alloc-grid.c file. Make sure it compiles.
 - Words are separated by spaces
 - Returns NULL if str == NULL or str == ""
 - If your function fails, it should return NULL
+ alx
 
