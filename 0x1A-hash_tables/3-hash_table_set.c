@@ -1,40 +1,52 @@
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
 #include "hash_tables.h"
 
 /**
- * main - check the code
+ * hash_table_set - Add  an element in a hash table.
+ * @ht: Pointer
+ * @key: Key to add
+ * @value: Value.
  *
- * Return: Always EXIT_SUCCESS.
+ * Return: On failure - 0. Otherwise - 1.
  */
-int main(void)
+int hash_table_set(hash_table_t *ht, const char *key, const char *value)
 {
-        hash_table_t *ht;
-        char *key;
-        char *value;
+	hash_node_t *new_node;
+	char *value_copy;
+	unsigned long int index, i;
 
-        ht = hash_table_create(1024);
-        hash_table_set(ht, "c", "fun");
-        hash_table_set(ht, "python", "awesome");
-        hash_table_set(ht, "Bob", "and Kris love asm");
-        hash_table_set(ht, "N", "queens");
-        hash_table_set(ht, "Asterix", "Obelix");
-        hash_table_set(ht, "Betty", "Cool");
-        hash_table_set(ht, "98", "Battery Streetz");
-        key = strdup("Tim");
-        value = strdup("Britton");
-        hash_table_set(ht, key, value);
-        key[0] = '\0';
-        value[0] = '\0';
-        free(key);
-        free(value);
-        hash_table_set(ht, "98", "Battery Street");
-        hash_table_set(ht, "hetairas", "Bob");
-        hash_table_set(ht, "hetairas", "Bob Z");
-        hash_table_set(ht, "mentioner", "Bob");
-        hash_table_set(ht, "hetairas", "Bob Z Chu");
-        hash_table_print(ht);
-        hash_table_delete(ht);
-        return (EXIT_SUCCESS);
+	if (ht == NULL || key == NULL || *key == '\0' || value == NULL)
+		return (0);
+
+	value_copy = strdup(value);
+	if (value_copy == NULL)
+		return (0);
+
+	index = key_index((const unsigned char *)key, ht->size);
+	for (i = index; ht->array[i]; i++)
+	{
+		if (strcmp(ht->array[i]->key, key) == 0)
+		{
+			free(ht->array[i]->value);
+			ht->array[i]->value = value_copy;
+			return (1);
+		}
+	}
+
+	new_node = malloc(sizeof(hash_node_t));
+	if (new_node == NULL)
+	{
+		free(value_copy);
+		return (0);
+	}
+	new_node->key = strdup(key);
+	if (new_node->key == NULL)
+	{
+		free(new_node);
+		return (0);
+	}
+	new_node->value = value_copy;
+	new_node->next = ht->array[index];
+	ht->array[index] = new_node;
+
+	return (1);
 }
